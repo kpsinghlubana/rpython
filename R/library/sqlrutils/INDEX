@@ -1,0 +1,20 @@
+InputData               Input Data for SQL Stored Procedure: Class
+                        Generator
+InputParameter          Input Parameter for SQL Stored Procedure: Class
+                        Generator
+OutputData              Output Data for SQL Stored Procedure: Class
+                        Generator
+OutputParameter         Output Parameter for SQL Stored Procedure:
+                        Class Generator
+StoredProcedure         SQL Server Stored Procedure: Class Generator
+executeStoredProcedure
+                        Execute a SQL Stored Procedure
+getInputParameters      Get a List of Input Parameters of a SQL Stored
+                        Procedure
+registerStoredProcedure
+                        Register a SQL Stored Procedure with a Database
+setInputDataQuery       Assign a Query to the Input Data Parameter of
+                        the SQL Stored Procedure
+setInputParameterValue
+                        Assign a Value to the Input Data Parameter of
+                        the SQL Stored Procedure

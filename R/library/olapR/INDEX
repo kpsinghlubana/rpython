@@ -1,0 +1,6 @@
+OlapConnection          olapR OlapConnection Creation
+Query                   olapR Query Construction
+execute2D               olapR execute2D Methods
+executeMD               olapR executeMD Methods
+explore                 olapR explore Method
+olapR                   OlapR: OLAP Cube access in R

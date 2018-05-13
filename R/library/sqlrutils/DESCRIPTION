@@ -1,0 +1,18 @@
+Package: sqlrutils
+Type: Package
+Title: Wraps R code into executable SQL Server stored procedures
+Version: 1.0.0
+Author: Microsoft Corporation
+Maintainer: Microsoft Corporation <msrpack@microsoft.com>
+Depends: R (>= 3.2.2)
+Imports: RevoScaleR
+Description: Provides a set of functions allowing the user
+    to wrap their R script into a TSQL stored procedure, register
+    that stored procedure with a database, and test it from an R
+    development environment.
+License: file LICENSE
+Copyright: Copyright 2016 Microsoft Corporation
+RoxygenNote: 5.0.1
+Suggests: testthat, knitr, rmarkdown, roxygen2
+VignetteBuilder: knitr
+Built: R 3.4.1; ; 2018-02-11 00:59:02 UTC; windows

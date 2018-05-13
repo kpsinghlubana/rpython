@@ -1,0 +1,390 @@
+---
+title: "sqlrutils Automation R Package"
+author: "Microsoft"
+date: "09/03/2016"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sqlrutils Automation R Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## Contents:
+
+* __Package Info__
+* __API Overview__
+* __Step by Step Guide for Users__
+* __Code Samples__
+
+## Package Info
+sqlrutils package provides a mechanism for R users to wrap their R script into a TSQL stored procedure, register that stored procedure with a database, and test it from an R development environment. It enables the users to:
+
+1. Generate a TSQL script needed for creating a stored procedure by embedding the R script as a parameter to sp_execute_external_script and setting other parameters appropriately.
+1. Capture the TSQL script as a string inside an R data structure
+1. Optionally, generate a .sql file
+1. Register the SP using the generated script from R development environment
+1. Execute registered stored procedure from R development environment and process output1
+1. Support common user scenarios for ETL, Training, and Scoring
+
+## API overview
+
+* __InputData  (name, defaultQuery = NULL, query = NULL)__ – S3 object that captures the information about the data that comes into an R data frame from SQL Server.  
+
+    _Parameter details_:
+    
+    * name – character string, the name of the data frame input parameter into the R function that is to be embedded inside a SQL stored procedure.
+    * defaultQuery -  character string specifying the default query that will retrieve the data if a different query is not provided at the time of the execution of the stored procedure. Must be a simple SELECT query.
+    * query – default value for the query that populates the data frame named by the previous parameter.
+
+* __InputParameter(name, type, defaultValue = NULL, defaultQuery = NULL, value = NULL, enableOutput = FALSE)__ – S3 object that captures information about a single input parameter into the R function that is to be embedded into the TSQL script. The user must provide the name and the R type of the input parameter. 
+
+    _Parameter details:_
+    
+    * name - character string, the name of the input parameter object.
+    * type - character string representing the R type of the input parameter object.
+    * defaultValue - default value of the parameter. Not supported for "raw".
+    * defaultQuery - character string specifying the default query that will retrieve the data if a different query is not provided at the time of the execution of the stored procedure.
+    * value - value that will be used for the parameter in the next run of the stored procedure.
+    * enableOutput - whether this is an input / output parameter
+
+* __OutputData(name)__ – S3 object needs to be created if the function that is to be embedded into the TSQL returns a list that contains a dataframe. The OutputData object captures the information about the name of data frame inside the list. The return list can contain at most one data frame.
+
+    _Parameter details:_
+    
+    * name - character string, the name of the data frame variable.
+
+* __OutputParameter (name, type)__ - S3 object. Must be created if the function that is to be embedded into the TSQL returns a list. It captures the information about a single member of the list that is NOT a data frame. The user must provide the name of the R in the list as well as its R type. 
+
+    _Parameter details:_
+    
+    * name - character string, the name of the output parameter object.
+    * type - R type of the output parameter object.
+
+* __StoredProcedure (func, spName, ..., filePath = NULL ,dbName = NULL,  connectionString = NULL, batchSeparator = "GO")__ - S3 object. The constructor generates a SQLServer Stored Procedure Object and optionally a .sql file containing a query to create a stored procedure. StoredProcedure $registrationVec contains strings representing the queries needed for creation of the stored procedure.
+
+    _Parameter details:_
+    
+    * func - valid R function or a string name of a valid R function: 1) All of the variables that the function relies on should be defined either inside the function or come in as input parameters. Among the parameters there can be at most 1 data frame. The function should return either a data frame, a named list, or NULL. There can be at most one data frame inside the list.
+    * spName - character string specifying name for the stored procedure.
+    * ... - optional input and output parameters for the stored procedure; must be objects of classes InputData, InputParameter, or     outputParameter.
+    * filePath - character string specifying "C:\\Users\\user\\Documents" to the directory in which to create the .sql. If NULL the .sql file is not generated.
+    * dbName - character string specifying name of the database to use.
+    * connectionString - character string specifying the connection string.
+    * batchSeparator - desired SQL batch separator (only relevant if filePath is defined).
+
+*	__getInputParameters(sqlSP)__ – S3 method that returns a list containing the InputData/Parameter objects with which the StoredProcedure was created. The objects do not contain queries or values associated with them. Those must be set explicitly in order to execute the stored procedure, unless the object contains a default value.
+
+    _Parameter details:_
+    
+    * sqlSP - valid StoredProcedure Object.
+
+*	__setInputDataQuery(inputData, query)__  – S3 method which assigns a query to the InputParameter object (inParam) that is to be passed to executeStoredProcedure in order to execute a stored procedure).
+
+    _Parameter details_:
+    
+    * inputData - character string, the name of the data frame input parameter into the R function.
+    * query - character string representing a query.
+
+*	__setInputParameterValue(inParam, value)__ – S3 method which assigns a value to the InputParameter object (inParam) that is to be passed to executeStoredProcedure in order to execute a stored procedure)
+
+    _Parameter details_:
+    
+    * inParam - character string, the name of input parameter into the R function.
+    * value - value that is to be bound to the input parameter. Note: binding for input parameters of type "raw" is not supported.
+
+*	__registerStoredProcedure(sqlSP, connectionString = NULL)__ –  S3 method which registers the stored procedure with the specified database using the registrationVec component of the StoredProcedure object (sqlSP).
+
+    _Parameter details_:
+    
+    * sqlSP - a valid StoredProcedure object.
+    * connectionString - character string (must be provided if the StoredProcedure object was created without a connection string).
+
+*	__executeStoredProcedure(sqlSP, ..., connectionString = NULL)__ – S3 method which executes the stored procedure represented by the sqlSP object.
+
+    _Parameter details_:
+    
+    * sqlSP - StoredProcedure object.
+    * ... - arbitrary number of input parameters, whose values/queries are set to enable the execution.
+    
+    _Note_:
+    
+    This function requires a 3.8 ODBC driver. For SQL Server, _ODBC Driver 13 for SQL Server_ is a good choice.
+
+## Step by step guide for the users
+
+### Part I: Format your R script
+
+1. Wrap the code into a function.
+1. All of the variables that the function relies on should be defined either inside the function or come in as input parameters. 
+1. The input parameters of the function will become the input parameters of the sql stored procedure, and thus should conform to the following type requirements:
+    * Among the input parameters there can be at most 1 data frame.
+    * The objects inside the data frame as well as all other input parameters of the function should be of the following types: POSIXct , numeric, character, integer, logical, raw.
+    * If an input type is not one of the above, it needs to be serialized and passed into the function as “raw”. The function should take the necessary steps to unserialize it.
+  
+1.	The function should output one of the following:
+    * Data frame containing objects of classes mentioned in 3(ii).
+    * Named list, where the names are the names of the variables in the list (i.e. list(x = x)). The list can contain at most 1 data frame. The objects in the data frame as well as all other members of the list should have types specified in 3.
+    * NULL
+    
+### Part II: Make calls to our package
+
+1. If your function takes input parameters, for each one of them create the following objects:
+    * For the input parameter that is a data frame create a InputData object
+    * For all other input parameters create InputParameter objects
+1. If your function outputs a list:
+    * For the variable in the list that is a data frame create a OutputData object
+    * For all other members of the list create OutputParameter objects
+    * If you function outputs a data frame directly, without first wrapping it into a list, you do not have create any of such objects and can simply skip the step. Same if your function returns NULL.
+1. Utilize one the StoredProcedure constructor to generate a query that will create a SQL stored procedure containing the R function
+1. Use registerStoredProcedure function to register the stored procedure with the database
+1. Before you execute the stored procedure: if the stored procedure has input parameters those need to be set before the function can be executed:
+    * Call getInputParameters to get a list of input parameter objects
+    * Set either $query or $value for each one of them (but not both!)
+    * Use executeStoredProcedure to execute the stored procedure from the R development environment. If you took step 9 pass it the list of input parameter objects that you set.
+
+## Code Samples
+### ETL Example: reading from the database and writing back to the database
+```R
+> etl1 <- function() {
++   # The query to get the data
++   qq <- "select top 10000 ArrDelay,CRSDepTime,DayOfWeek from AirlineDemoSmall"
++   # The connection string. For executeStoredProcedure to work, ODBC 3.8 driver is needed.
++   conStr <- paste("Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;",
++                   "Trusted_Connection=Yes;", sep = "")
++   # The data source - retrieves the data from the database
++   dsSqls <- RxSqlServerData(sqlQuery = qq, connectionString = conStr)
++   # The destination data source
++   dsSqls2 <- RxSqlServerData(table ="cleanData",  connectionString = conStr)
++   # A transformation function
++   transformFunc <- function(data) {
++     data$CRSDepHour <- as.integer(trunc(data$CRSDepTime))
++     return(data)
++   }
++   # The transformation variables
++   transformVars <- c("CRSDepTime")
++   # set the compute context
++   sqlCompute <- RxInSqlServer(numTasks = 4, connectionString = conStr)
++   rxSetComputeContext(sqlCompute)
++   # drop table if necessary
++   if (rxSqlServerTableExists("cleanData")) {
++     rxSqlServerDropTable("cleanData")
++   }
++   # perform the transformation
++   rxDataStep(inData = dsSqls,
++              outFile = dsSqls2,
++              transformFunc = transformFunc,
++              transformVars = transformVars,
++              overwrite = TRUE)
++   return(NULL)
++ }
+> 
+> # create the sql server stored procedure object
+> etlSP1 <- StoredProcedure("etl1", "spETL_ds_to_ds",
++                       filePath = "C:\\Users\\user\\Documents",
++                       dbName ="RevoTestDB")
+> # connection string necessary for registrations and execution
+> # since we did not pass it to StoredProcedure
+> conStr <- "Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;"
+> #register the stored procedure with the database
+> registerStoredProcedure(etlSP1, conStr)
+[1] TRUE
+> #execute the stored procedure
+> executeStoredProcedure(etlSP1, connectionString = conStr, verbose = TRUE)
+exec spETL_ds_to_ds 
+named list()
+```
+### Training Example: reading from a data frame and writing to a data frame
+
+```R
+> train1 <- function(in_df) {
++   factorLevels <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
++   in_df[,"DayOfWeek"] <- factor(in_df[,"DayOfWeek"], levels=factorLevels)
++   # The model formula
++   formula <- ArrDelay ~ CRSDepTime + DayOfWeek + CRSDepHour:DayOfWeek
++ 
++   # Train the model
++   mm <- rxLinMod(formula, data = in_df, transformFunc = NULL, transformVars = NULL)
++ 
++   # Store the model into the database
++   # rdata needs to be created beforehand
++   conStr <- paste0("Driver={ODBC Driver 13 for SQL Server};Server=.;",
++                    "Database=RevoTestDB;Trusted_Connection=Yes;")
++   out.table = "rdata"
++   # write the model to the table
++   ds = RxOdbcData(table = out.table, connectionString = conStr)
++ 
++   rxWriteObject(ds, "linmod.v1", mm, keyName = "key",
++                 valueName = "value")
++ 
++   # the model needs to be serialized before it can be added to the return list
++   mm <- memCompress(serialize(mm, connection = NULL), type="gzip")
++   return(data.frame(mm))
++ }
+> 
+> conStr <- "Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;"
+> # create  an InputData object for the input data frame in_df
+> indata <- InputData("in_df",
++                defaultQuery = paste0("select top 10000 ArrDelay,CRSDepTime,",
++                                      "DayOfWeek,CRSDepHour from cleanData"))
+> # create the sql server stored procedure object
+> trainSP1 <- StoredProcedure('train1', "spTrain_df_to_df", indata,
++                        dbName = "RevoTestDB",
++                        connectionString = conStr,
++                        filePath = "C:\\Users\\user\\Documents")
+> # registerStoredProcedure and executeStoredProcedure do not require a connection string since we
+> # provided one when we created trainSP1
+> registerStoredProcedure(trainSP1)
+[1] TRUE
+> model <- executeStoredProcedure(trainSP1, verbose = TRUE)
+exec spTrain_df_to_df 
+> result2v2 <- rxReadObject(model$data[1,1][[1]])
+> result2v2
+Call:
+rxLinMod(formula = formula, data = in_df, transformFunc = NULL, 
+    transformVars = NULL)
+
+Linear Regression Results for: ArrDelay ~ CRSDepTime + DayOfWeek + CRSDepHour:DayOfWeek
+Data: in_df
+Dependent variable(s): ArrDelay
+Total independent variables: 16 (Including number dropped: 7)
+Number of valid observations: 9713
+Number of missing observations: 287 
+ 
+Coefficients:
+                                      ArrDelay
+(Intercept)                        -12.2606079
+CRSDepTime                           0.8384946
+DayOfWeek=Monday                     9.9722108
+DayOfWeek=Tuesday                   10.7932985
+DayOfWeek=Wednesday                  0.2561862
+DayOfWeek=Thursday                     Dropped
+DayOfWeek=Friday                       Dropped
+DayOfWeek=Saturday                     Dropped
+DayOfWeek=Sunday                       Dropped
+CRSDepHour for DayOfWeek=Monday     -0.4449961
+CRSDepHour for DayOfWeek=Tuesday    -0.6194943
+CRSDepHour for DayOfWeek=Wednesday   1.0483718
+CRSDepHour for DayOfWeek=Thursday    0.5470396
+CRSDepHour for DayOfWeek=Friday        Dropped
+CRSDepHour for DayOfWeek=Saturday      Dropped
+CRSDepHour for DayOfWeek=Sunday        Dropped
+```
+### Training Example: reading from a data frame and return a model as an output parameter
+```R
+> train2 <- function(in_df) {
++     factorLevels <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
++   in_df[,"DayOfWeek"] <- factor(in_df[,"DayOfWeek"], levels=factorLevels)
++   # The model formula
++   formula <- ArrDelay ~ CRSDepTime + DayOfWeek + CRSDepHour:DayOfWeek
++   # Train the model
++   rxSetComputeContext("local")
++   mm <- rxLinMod(formula, data = in_df, transformFunc = NULL, transformVars = NULL)
++   # the model needs to be serialized before it can be added to the return list
++   mm <- memCompress(serialize(mm, connection = NULL),type="gzip")
++   return(list(mm = mm))
++ }
+> # create  an InputData object for the input data frame in_df
+> indata <- InputData(name = "in_df",
++                 query = paste0("select top 10000 ArrDelay,CRSDepTime,",
++                                "DayOfWeek,CRSDepHour from cleanData"))
+> # create an OutputParameter object for the model inside the return list
+> outModelParam <- OutputParameter("mm", "raw")
+> trainSP2 <- StoredProcedure(train2, "spTrain_df_to_op", indata, outModelParam,
++                         filePath = "C:\\Users\\user\\Documents")
+> conStr <- "Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;"
+> # need to pass connection string to registerStoredProcedure and executeStoredProcedure since we did not
+> # provide one when creating trainSP2
+> registerStoredProcedure(trainSP2, conStr)
+[1] TRUE
+> model <- executeStoredProcedure(trainSP2, indata, connectionString = conStr, verbose = TRUE)
+exec spTrain_df_to_op  @input_data_1_outer = ?,  @mm_outer = ?
+> rxReadObject(model$params[[1]])
+Call:
+rxLinMod(formula = formula, data = in_df, transformFunc = NULL, 
+    transformVars = NULL)
+
+Linear Regression Results for: ArrDelay ~ CRSDepTime + DayOfWeek + CRSDepHour:DayOfWeek
+Data: in_df
+Dependent variable(s): ArrDelay
+Total independent variables: 16 (Including number dropped: 7)
+Number of valid observations: 9713
+Number of missing observations: 287 
+ 
+Coefficients:
+                                      ArrDelay
+(Intercept)                        -12.2606079
+CRSDepTime                           0.8384946
+DayOfWeek=Monday                     9.9722108
+DayOfWeek=Tuesday                   10.7932985
+DayOfWeek=Wednesday                  0.2561862
+DayOfWeek=Thursday                     Dropped
+DayOfWeek=Friday                       Dropped
+DayOfWeek=Saturday                     Dropped
+DayOfWeek=Sunday                       Dropped
+CRSDepHour for DayOfWeek=Monday     -0.4449961
+CRSDepHour for DayOfWeek=Tuesday    -0.6194943
+CRSDepHour for DayOfWeek=Wednesday   1.0483718
+CRSDepHour for DayOfWeek=Thursday    0.5470396
+CRSDepHour for DayOfWeek=Friday        Dropped
+CRSDepHour for DayOfWeek=Saturday      Dropped
+CRSDepHour for DayOfWeek=Sunday        Dropped
+```
+
+### Scoring Example: batch prediction
+
+The data comes into the function as a data frame, the model comes in as a parameter, the name assigned to the predicted variable comes in as a parameter as well.
+The prediction is returned as a data frame. P-value becomes an output parameter of the stored procedure. It does not get propagated back to R, however, it can be captured from SSMS.
+```R
+> # indata - input data frame
+> # model_param - serialized model object
+> # predVarName - name of the predicted variable
+> score1 <- function(in_df, model_param, predVarNameInParam) {
++     factorLevels <- c("Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday")
++     in_df[,"DayOfWeek"] <- factor(in_df[,"DayOfWeek"], levels=factorLevels)
++   mm <- rxReadObject(as.raw(model_param))
++   # Predict
++   result <- rxPredict(modelObject = mm,
++                       data = in_df,
++                       outData = NULL,
++                       predVarNames = predVarNameInParam,
++                       extraVarsToWrite = c("ArrDelay"),
++                       writeModelVars = TRUE,
++                       overwrite = TRUE)
++   return(list(result = result, pvOutParam = mm$f.pvalue))
++ }
+> 
+> # create  an InputData object for the input data frame in_df
+> indata <- InputData(name = "in_df", defaultQuery = "SELECT top 10 * from cleanData")
+> # create InputParameter objects for model_param and predVarNameInParam
+> model <- InputParameter("model_param", "raw",
++                       defaultQuery = paste("select top 1 value from rdata",
++                                            "where [key] = 'linmod.v1'"))
+> predVarNameInParam <- InputParameter("predVarNameInParam", "character")
+> # create OutputData object for the data frame inside the return list
+> outData <- OutputData("result")
+> # create OutputParameter object for non data frame variable inside the return list
+> pvOutParam <- OutputParameter("pvOutParam", "numeric")
+> scoreSP1 <- StoredProcedure(score1, "spScore_df_param_df", indata, model, predVarNameInParam, outData, pvOutParam,
++                       filePath = "C:\\Users\\user\\Documents")
+> conStr <- "Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;"
+> # connection string necessary for registrations and execution
+> # since we did not pass it to StoredProcedure
+> registerStoredProcedure(scoreSP1, conStr)
+[1] TRUE
+> model <- executeStoredProcedure(scoreSP1, predVarNameInParam = "ArrDelayEstimate", connectionString = conStr, verbose = TRUE)
+exec spScore_df_param_df  @predVarNameInParam_outer = ?,  @pvOutParam_outer = ?
+> model$data
+     column1 column2   column3 column4 column5
+1  1.8120845       6  9.666666  Monday       9
+2  0.4219664      -2  6.416667  Monday       6
+3  6.2803173      -2 20.833334  Monday      20
+4  5.6771952     -15 19.583334  Monday      19
+5  2.1357094      -7 10.583334  Monday      10
+6  6.0449431      16 21.083332  Monday      21
+7  2.5990813       0 11.666666  Monday      11
+8  5.7213215      -9 20.166668  Monday      20
+9  0.8853391       2  7.500000  Monday       7
+10 1.2788375      19  8.500000  Monday       8
+> model$params[[1]]
+[1] 4.032124e-154
+```

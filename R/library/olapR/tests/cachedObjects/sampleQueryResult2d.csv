@@ -1,0 +1,151 @@
+"","[Date].[Calendar Quarter].[Calendar Quarter].[MEMBER_CAPTION]","[Product].[Product Line].[Product Line].[MEMBER_CAPTION]","[Measures].[Internet Sales Count]"
+"1",NA,"Components",NA
+"2",NA,"Mountain",16898
+"3",NA,"Road",15552
+"4",NA,"Accessory",23358
+"5",NA,"Touring",4590
+"6",NA,"Assembly Components",NA
+"7","Q1 CY 2005","Components",NA
+"8","Q1 CY 2005","Mountain",NA
+"9","Q1 CY 2005","Road",NA
+"10","Q1 CY 2005","Accessory",NA
+"11","Q1 CY 2005","Touring",NA
+"12","Q1 CY 2005","Assembly Components",NA
+"13","Q2 CY 2005","Components",NA
+"14","Q2 CY 2005","Mountain",NA
+"15","Q2 CY 2005","Road",NA
+"16","Q2 CY 2005","Accessory",NA
+"17","Q2 CY 2005","Touring",NA
+"18","Q2 CY 2005","Assembly Components",NA
+"19","Q3 CY 2005","Components",NA
+"20","Q3 CY 2005","Mountain",75
+"21","Q3 CY 2005","Road",373
+"22","Q3 CY 2005","Accessory",NA
+"23","Q3 CY 2005","Touring",NA
+"24","Q3 CY 2005","Assembly Components",NA
+"25","Q4 CY 2005","Components",NA
+"26","Q4 CY 2005","Mountain",98
+"27","Q4 CY 2005","Road",467
+"28","Q4 CY 2005","Accessory",NA
+"29","Q4 CY 2005","Touring",NA
+"30","Q4 CY 2005","Assembly Components",NA
+"31","Q1 CY 2006","Components",NA
+"32","Q1 CY 2006","Mountain",93
+"33","Q1 CY 2006","Road",465
+"34","Q1 CY 2006","Accessory",NA
+"35","Q1 CY 2006","Touring",NA
+"36","Q1 CY 2006","Assembly Components",NA
+"37","Q2 CY 2006","Components",NA
+"38","Q2 CY 2006","Mountain",130
+"39","Q2 CY 2006","Road",505
+"40","Q2 CY 2006","Accessory",NA
+"41","Q2 CY 2006","Touring",NA
+"42","Q2 CY 2006","Assembly Components",NA
+"43","Q3 CY 2006","Components",NA
+"44","Q3 CY 2006","Mountain",160
+"45","Q3 CY 2006","Road",572
+"46","Q3 CY 2006","Accessory",NA
+"47","Q3 CY 2006","Touring",NA
+"48","Q3 CY 2006","Assembly Components",NA
+"49","Q4 CY 2006","Components",NA
+"50","Q4 CY 2006","Mountain",232
+"51","Q4 CY 2006","Road",520
+"52","Q4 CY 2006","Accessory",NA
+"53","Q4 CY 2006","Touring",NA
+"54","Q4 CY 2006","Assembly Components",NA
+"55","Q1 CY 2007","Components",NA
+"56","Q1 CY 2007","Mountain",304
+"57","Q1 CY 2007","Road",484
+"58","Q1 CY 2007","Accessory",NA
+"59","Q1 CY 2007","Touring",NA
+"60","Q1 CY 2007","Assembly Components",NA
+"61","Q2 CY 2007","Components",NA
+"62","Q2 CY 2007","Mountain",379
+"63","Q2 CY 2007","Road",571
+"64","Q2 CY 2007","Accessory",NA
+"65","Q2 CY 2007","Touring",NA
+"66","Q2 CY 2007","Assembly Components",NA
+"67","Q3 CY 2007","Components",NA
+"68","Q3 CY 2007","Mountain",2568
+"69","Q3 CY 2007","Road",2035
+"70","Q3 CY 2007","Accessory",3883
+"71","Q3 CY 2007","Touring",629
+"72","Q3 CY 2007","Assembly Components",NA
+"73","Q4 CY 2007","Components",NA
+"74","Q4 CY 2007","Mountain",3854
+"75","Q4 CY 2007","Road",2885
+"76","Q4 CY 2007","Accessory",5711
+"77","Q4 CY 2007","Touring",1140
+"78","Q4 CY 2007","Assembly Components",NA
+"79","Q1 CY 2008","Components",NA
+"80","Q1 CY 2008","Mountain",3911
+"81","Q1 CY 2008","Road",2869
+"82","Q1 CY 2008","Accessory",5929
+"83","Q1 CY 2008","Touring",1199
+"84","Q1 CY 2008","Assembly Components",NA
+"85","Q2 CY 2008","Components",NA
+"86","Q2 CY 2008","Mountain",4438
+"87","Q2 CY 2008","Road",3457
+"88","Q2 CY 2008","Accessory",6776
+"89","Q2 CY 2008","Touring",1477
+"90","Q2 CY 2008","Assembly Components",NA
+"91","Q3 CY 2008","Components",NA
+"92","Q3 CY 2008","Mountain",656
+"93","Q3 CY 2008","Road",349
+"94","Q3 CY 2008","Accessory",1059
+"95","Q3 CY 2008","Touring",145
+"96","Q3 CY 2008","Assembly Components",NA
+"97","Q4 CY 2008","Components",NA
+"98","Q4 CY 2008","Mountain",NA
+"99","Q4 CY 2008","Road",NA
+"100","Q4 CY 2008","Accessory",NA
+"101","Q4 CY 2008","Touring",NA
+"102","Q4 CY 2008","Assembly Components",NA
+"103","Q1 CY 2009","Components",NA
+"104","Q1 CY 2009","Mountain",NA
+"105","Q1 CY 2009","Road",NA
+"106","Q1 CY 2009","Accessory",NA
+"107","Q1 CY 2009","Touring",NA
+"108","Q1 CY 2009","Assembly Components",NA
+"109","Q2 CY 2009","Components",NA
+"110","Q2 CY 2009","Mountain",NA
+"111","Q2 CY 2009","Road",NA
+"112","Q2 CY 2009","Accessory",NA
+"113","Q2 CY 2009","Touring",NA
+"114","Q2 CY 2009","Assembly Components",NA
+"115","Q3 CY 2009","Components",NA
+"116","Q3 CY 2009","Mountain",NA
+"117","Q3 CY 2009","Road",NA
+"118","Q3 CY 2009","Accessory",NA
+"119","Q3 CY 2009","Touring",NA
+"120","Q3 CY 2009","Assembly Components",NA
+"121","Q4 CY 2009","Components",NA
+"122","Q4 CY 2009","Mountain",NA
+"123","Q4 CY 2009","Road",NA
+"124","Q4 CY 2009","Accessory",NA
+"125","Q4 CY 2009","Touring",NA
+"126","Q4 CY 2009","Assembly Components",NA
+"127","Q1 CY 2010","Components",NA
+"128","Q1 CY 2010","Mountain",NA
+"129","Q1 CY 2010","Road",NA
+"130","Q1 CY 2010","Accessory",NA
+"131","Q1 CY 2010","Touring",NA
+"132","Q1 CY 2010","Assembly Components",NA
+"133","Q2 CY 2010","Components",NA
+"134","Q2 CY 2010","Mountain",NA
+"135","Q2 CY 2010","Road",NA
+"136","Q2 CY 2010","Accessory",NA
+"137","Q2 CY 2010","Touring",NA
+"138","Q2 CY 2010","Assembly Components",NA
+"139","Q3 CY 2010","Components",NA
+"140","Q3 CY 2010","Mountain",NA
+"141","Q3 CY 2010","Road",NA
+"142","Q3 CY 2010","Accessory",NA
+"143","Q3 CY 2010","Touring",NA
+"144","Q3 CY 2010","Assembly Components",NA
+"145","Q4 CY 2010","Components",NA
+"146","Q4 CY 2010","Mountain",NA
+"147","Q4 CY 2010","Road",NA
+"148","Q4 CY 2010","Accessory",NA
+"149","Q4 CY 2010","Touring",NA
+"150","Q4 CY 2010","Assembly Components",NA

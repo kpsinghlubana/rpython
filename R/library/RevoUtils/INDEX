@@ -1,0 +1,6 @@
+Revo.home               Return the Revolution R Home Directory
+RevoLicense             Revolution R Information Functions
+getRevoRepos            Get Path to Revolution Analytics Package
+                        Repositories
+readNews                Read R or Package NEWS Files
+totalSystemMemory       Obtain Total System Memory

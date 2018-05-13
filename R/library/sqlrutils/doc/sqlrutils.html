@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Microsoft" />
+
+<meta name="date" content="2016-09-03" />
+
+<title>sqlrutils Automation R Package</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">sqlrutils Automation R Package</h1>
+<h4 class="author"><em>Microsoft</em></h4>
+<h4 class="date"><em>09/03/2016</em></h4>
+
+
+
+<div id="contents" class="section level2">
+<h2>Contents:</h2>
+<ul>
+<li><strong>Package Info</strong></li>
+<li><strong>API Overview</strong></li>
+<li><strong>Step by Step Guide for Users</strong></li>
+<li><strong>Code Samples</strong></li>
+</ul>
+</div>
+<div id="package-info" class="section level2">
+<h2>Package Info</h2>
+<p>sqlrutils package provides a mechanism for R users to wrap their R script into a TSQL stored procedure, register that stored procedure with a database, and test it from an R development environment. It enables the users to:</p>
+<ol style="list-style-type: decimal">
+<li>Generate a TSQL script needed for creating a stored procedure by embedding the R script as a parameter to sp_execute_external_script and setting other parameters appropriately.</li>
+<li>Capture the TSQL script as a string inside an R data structure</li>
+<li>Optionally, generate a .sql file</li>
+<li>Register the SP using the generated script from R development environment</li>
+<li>Execute registered stored procedure from R development environment and process output1</li>
+<li>Support common user scenarios for ETL, Training, and Scoring</li>
+</ol>
+</div>
+<div id="api-overview" class="section level2">
+<h2>API overview</h2>
+<ul>
+<li><p><strong>InputData (name, defaultQuery = NULL, query = NULL)</strong> – S3 object that captures the information about the data that comes into an R data frame from SQL Server.</p>
+<p><em>Parameter details</em>:</p>
+<ul>
+<li>name – character string, the name of the data frame input parameter into the R function that is to be embedded inside a SQL stored procedure.</li>
+<li>defaultQuery - character string specifying the default query that will retrieve the data if a different query is not provided at the time of the execution of the stored procedure. Must be a simple SELECT query.</li>
+<li>query – default value for the query that populates the data frame named by the previous parameter.</li>
+</ul></li>
+<li><p><strong>InputParameter(name, type, defaultValue = NULL, defaultQuery = NULL, value = NULL, enableOutput = FALSE)</strong> – S3 object that captures information about a single input parameter into the R function that is to be embedded into the TSQL script. The user must provide the name and the R type of the input parameter.</p>
+<p><em>Parameter details:</em></p>
+<ul>
+<li>name - character string, the name of the input parameter object.</li>
+<li>type - character string representing the R type of the input parameter object.</li>
+<li>defaultValue - default value of the parameter. Not supported for “raw”.</li>
+<li>defaultQuery - character string specifying the default query that will retrieve the data if a different query is not provided at the time of the execution of the stored procedure.</li>
+<li>value - value that will be used for the parameter in the next run of the stored procedure.</li>
+<li>enableOutput - whether this is an input / output parameter</li>
+</ul></li>
+<li><p><strong>OutputData(name)</strong> – S3 object needs to be created if the function that is to be embedded into the TSQL returns a list that contains a dataframe. The OutputData object captures the information about the name of data frame inside the list. The return list can contain at most one data frame.</p>
+<p><em>Parameter details:</em></p>
+<ul>
+<li>name - character string, the name of the data frame variable.</li>
+</ul></li>
+<li><p><strong>OutputParameter (name, type)</strong> - S3 object. Must be created if the function that is to be embedded into the TSQL returns a list. It captures the information about a single member of the list that is NOT a data frame. The user must provide the name of the R in the list as well as its R type.</p>
+<p><em>Parameter details:</em></p>
+<ul>
+<li>name - character string, the name of the output parameter object.</li>
+<li>type - R type of the output parameter object.</li>
+</ul></li>
+<li><p><strong>StoredProcedure (func, spName, …, filePath = NULL ,dbName = NULL, connectionString = NULL, batchSeparator = “GO”)</strong> - S3 object. The constructor generates a SQLServer Stored Procedure Object and optionally a .sql file containing a query to create a stored procedure. StoredProcedure $registrationVec contains strings representing the queries needed for creation of the stored procedure.</p>
+<p><em>Parameter details:</em></p>
+<ul>
+<li>func - valid R function or a string name of a valid R function: 1) All of the variables that the function relies on should be defined either inside the function or come in as input parameters. Among the parameters there can be at most 1 data frame. The function should return either a data frame, a named list, or NULL. There can be at most one data frame inside the list.</li>
+<li>spName - character string specifying name for the stored procedure.</li>
+<li>… - optional input and output parameters for the stored procedure; must be objects of classes InputData, InputParameter, or outputParameter.</li>
+<li>filePath - character string specifying “C:\Users\user\Documents” to the directory in which to create the .sql. If NULL the .sql file is not generated.</li>
+<li>dbName - character string specifying name of the database to use.</li>
+<li>connectionString - character string specifying the connection string.</li>
+<li>batchSeparator - desired SQL batch separator (only relevant if filePath is defined).</li>
+</ul></li>
+<li><p><strong>getInputParameters(sqlSP)</strong> – S3 method that returns a list containing the InputData/Parameter objects with which the StoredProcedure was created. The objects do not contain queries or values associated with them. Those must be set explicitly in order to execute the stored procedure, unless the object contains a default value.</p>
+<p><em>Parameter details:</em></p>
+<ul>
+<li>sqlSP - valid StoredProcedure Object.</li>
+</ul></li>
+<li><p><strong>setInputDataQuery(inputData, query)</strong> – S3 method which assigns a query to the InputParameter object (inParam) that is to be passed to executeStoredProcedure in order to execute a stored procedure).</p>
+<p><em>Parameter details</em>:</p>
+<ul>
+<li>inputData - character string, the name of the data frame input parameter into the R function.</li>
+<li>query - character string representing a query.</li>
+</ul></li>
+<li><p><strong>setInputParameterValue(inParam, value)</strong> – S3 method which assigns a value to the InputParameter object (inParam) that is to be passed to executeStoredProcedure in order to execute a stored procedure)</p>
+<p><em>Parameter details</em>:</p>
+<ul>
+<li>inParam - character string, the name of input parameter into the R function.</li>
+<li>value - value that is to be bound to the input parameter. Note: binding for input parameters of type “raw” is not supported.</li>
+</ul></li>
+<li><p><strong>registerStoredProcedure(sqlSP, connectionString = NULL)</strong> – S3 method which registers the stored procedure with the specified database using the registrationVec component of the StoredProcedure object (sqlSP).</p>
+<p><em>Parameter details</em>:</p>
+<ul>
+<li>sqlSP - a valid StoredProcedure object.</li>
+<li>connectionString - character string (must be provided if the StoredProcedure object was created without a connection string).</li>
+</ul></li>
+<li><p><strong>executeStoredProcedure(sqlSP, …, connectionString = NULL)</strong> – S3 method which executes the stored procedure represented by the sqlSP object.</p>
+<p><em>Parameter details</em>:</p>
+<ul>
+<li>sqlSP - StoredProcedure object.</li>
+<li>… - arbitrary number of input parameters, whose values/queries are set to enable the execution.</li>
+</ul>
+<p><em>Note</em>:</p>
+<p>This function requires a 3.8 ODBC driver. For SQL Server, <em>ODBC Driver 13 for SQL Server</em> is a good choice.</p></li>
+</ul>
+</div>
+<div id="step-by-step-guide-for-the-users" class="section level2">
+<h2>Step by step guide for the users</h2>
+<div id="part-i-format-your-r-script" class="section level3">
+<h3>Part I: Format your R script</h3>
+<ol style="list-style-type: decimal">
+<li>Wrap the code into a function.</li>
+<li>All of the variables that the function relies on should be defined either inside the function or come in as input parameters.</li>
+<li>The input parameters of the function will become the input parameters of the sql stored procedure, and thus should conform to the following type requirements:
+<ul>
+<li>Among the input parameters there can be at most 1 data frame.</li>
+<li>The objects inside the data frame as well as all other input parameters of the function should be of the following types: POSIXct , numeric, character, integer, logical, raw.</li>
+<li>If an input type is not one of the above, it needs to be serialized and passed into the function as “raw”. The function should take the necessary steps to unserialize it.</li>
+</ul></li>
+<li>The function should output one of the following:
+<ul>
+<li>Data frame containing objects of classes mentioned in 3(ii).</li>
+<li>Named list, where the names are the names of the variables in the list (i.e. list(x = x)). The list can contain at most 1 data frame. The objects in the data frame as well as all other members of the list should have types specified in 3.</li>
+<li>NULL</li>
+</ul></li>
+</ol>
+</div>
+<div id="part-ii-make-calls-to-our-package" class="section level3">
+<h3>Part II: Make calls to our package</h3>
+<ol style="list-style-type: decimal">
+<li>If your function takes input parameters, for each one of them create the following objects:
+<ul>
+<li>For the input parameter that is a data frame create a InputData object</li>
+<li>For all other input parameters create InputParameter objects</li>
+</ul></li>
+<li>If your function outputs a list:
+<ul>
+<li>For the variable in the list that is a data frame create a OutputData object</li>
+<li>For all other members of the list create OutputParameter objects</li>
+<li>If you function outputs a data frame directly, without first wrapping it into a list, you do not have create any of such objects and can simply skip the step. Same if your function returns NULL.</li>
+</ul></li>
+<li>Utilize one the StoredProcedure constructor to generate a query that will create a SQL stored procedure containing the R function</li>
+<li>Use registerStoredProcedure function to register the stored procedure with the database</li>
+<li>Before you execute the stored procedure: if the stored procedure has input parameters those need to be set before the function can be executed:
+<ul>
+<li>Call getInputParameters to get a list of input parameter objects</li>
+<li>Set either $query or $value for each one of them (but not both!)</li>
+<li>Use executeStoredProcedure to execute the stored procedure from the R development environment. If you took step 9 pass it the list of input parameter objects that you set.</li>
+</ul></li>
+</ol>
+</div>
+</div>
+<div id="code-samples" class="section level2">
+<h2>Code Samples</h2>
+<div id="etl-example-reading-from-the-database-and-writing-back-to-the-database" class="section level3">
+<h3>ETL Example: reading from the database and writing back to the database</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>etl1 &lt;-<span class="st"> </span>function() {
++<span class="st">   </span><span class="co"># The query to get the data</span>
++<span class="st">   </span>qq &lt;-<span class="st"> &quot;select top 10000 ArrDelay,CRSDepTime,DayOfWeek from AirlineDemoSmall&quot;</span>
++<span class="st">   </span><span class="co"># The connection string. For executeStoredProcedure to work, ODBC 3.8 driver is needed.</span>
++<span class="st">   </span>conStr &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&quot;Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;&quot;</span>,
++<span class="st">                   &quot;Trusted_Connection=Yes;&quot;</span>, <span class="dt">sep =</span> <span class="st">&quot;&quot;</span>)
++<span class="st">   </span><span class="co"># The data source - retrieves the data from the database</span>
++<span class="st">   </span>dsSqls &lt;-<span class="st"> </span><span class="kw">RxSqlServerData</span>(<span class="dt">sqlQuery =</span> qq, <span class="dt">connectionString =</span> conStr)
++<span class="st">   </span><span class="co"># The destination data source</span>
++<span class="st">   </span>dsSqls2 &lt;-<span class="st"> </span><span class="kw">RxSqlServerData</span>(<span class="dt">table =</span><span class="st">&quot;cleanData&quot;</span>,  <span class="dt">connectionString =</span> conStr)
++<span class="st">   </span><span class="co"># A transformation function</span>
++<span class="st">   </span>transformFunc &lt;-<span class="st"> </span>function(data) {
++<span class="st">     </span>data$CRSDepHour &lt;-<span class="st"> </span><span class="kw">as.integer</span>(<span class="kw">trunc</span>(data$CRSDepTime))
++<span class="st">     </span><span class="kw">return</span>(data)
++<span class="st">   </span>}
++<span class="st">   </span><span class="co"># The transformation variables</span>
++<span class="st">   </span>transformVars &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;CRSDepTime&quot;</span>)
++<span class="st">   </span><span class="co"># set the compute context</span>
++<span class="st">   </span>sqlCompute &lt;-<span class="st"> </span><span class="kw">RxInSqlServer</span>(<span class="dt">numTasks =</span> <span class="dv">4</span>, <span class="dt">connectionString =</span> conStr)
++<span class="st">   </span><span class="kw">rxSetComputeContext</span>(sqlCompute)
++<span class="st">   </span><span class="co"># drop table if necessary</span>
++<span class="st">   </span>if (<span class="kw">rxSqlServerTableExists</span>(<span class="st">&quot;cleanData&quot;</span>)) {
++<span class="st">     </span><span class="kw">rxSqlServerDropTable</span>(<span class="st">&quot;cleanData&quot;</span>)
++<span class="st">   </span>}
++<span class="st">   </span><span class="co"># perform the transformation</span>
++<span class="st">   </span><span class="kw">rxDataStep</span>(<span class="dt">inData =</span> dsSqls,
++<span class="st">              </span><span class="dt">outFile =</span> dsSqls2,
++<span class="st">              </span><span class="dt">transformFunc =</span> transformFunc,
++<span class="st">              </span><span class="dt">transformVars =</span> transformVars,
++<span class="st">              </span><span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
++<span class="st">   </span><span class="kw">return</span>(<span class="ot">NULL</span>)
++<span class="st"> </span>}
+&gt;<span class="st"> </span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># create the sql server stored procedure object</span>
+<span class="er">&gt;</span><span class="st"> </span>etlSP1 &lt;-<span class="st"> </span><span class="kw">StoredProcedure</span>(<span class="st">&quot;etl1&quot;</span>, <span class="st">&quot;spETL_ds_to_ds&quot;</span>,
++<span class="st">                       </span><span class="dt">filePath =</span> <span class="st">&quot;C:</span><span class="ch">\\</span><span class="st">Users</span><span class="ch">\\</span><span class="st">user</span><span class="ch">\\</span><span class="st">Documents&quot;</span>,
++<span class="st">                       </span><span class="dt">dbName =</span><span class="st">&quot;RevoTestDB&quot;</span>)
+&gt;<span class="st"> </span><span class="co"># connection string necessary for registrations and execution</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># since we did not pass it to StoredProcedure</span>
+<span class="er">&gt;</span><span class="st"> </span>conStr &lt;-<span class="st"> &quot;Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;&quot;</span>
+&gt;<span class="st"> </span><span class="co">#register the stored procedure with the database</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="kw">registerStoredProcedure</span>(etlSP1, conStr)
+[<span class="dv">1</span>] <span class="ot">TRUE</span>
+&gt;<span class="st"> </span><span class="co">#execute the stored procedure</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="kw">executeStoredProcedure</span>(etlSP1, <span class="dt">connectionString =</span> conStr, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
+exec spETL_ds_to_ds 
+named <span class="kw">list</span>()</code></pre></div>
+</div>
+<div id="training-example-reading-from-a-data-frame-and-writing-to-a-data-frame" class="section level3">
+<h3>Training Example: reading from a data frame and writing to a data frame</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>train1 &lt;-<span class="st"> </span>function(in_df) {
++<span class="st">   </span>factorLevels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Monday&quot;</span>,<span class="st">&quot;Tuesday&quot;</span>,<span class="st">&quot;Wednesday&quot;</span>,<span class="st">&quot;Thursday&quot;</span>,<span class="st">&quot;Friday&quot;</span>,<span class="st">&quot;Saturday&quot;</span>,<span class="st">&quot;Sunday&quot;</span>)
++<span class="st">   </span>in_df[,<span class="st">&quot;DayOfWeek&quot;</span>] &lt;-<span class="st"> </span><span class="kw">factor</span>(in_df[,<span class="st">&quot;DayOfWeek&quot;</span>], <span class="dt">levels=</span>factorLevels)
++<span class="st">   </span><span class="co"># The model formula</span>
++<span class="st">   </span>formula &lt;-<span class="st"> </span>ArrDelay ~<span class="st"> </span>CRSDepTime +<span class="st"> </span>DayOfWeek +<span class="st"> </span>CRSDepHour:DayOfWeek
++<span class="st"> </span>
++<span class="st">   </span><span class="co"># Train the model</span>
++<span class="st">   </span>mm &lt;-<span class="st"> </span><span class="kw">rxLinMod</span>(formula, <span class="dt">data =</span> in_df, <span class="dt">transformFunc =</span> <span class="ot">NULL</span>, <span class="dt">transformVars =</span> <span class="ot">NULL</span>)
++<span class="st"> </span>
++<span class="st">   </span><span class="co"># Store the model into the database</span>
++<span class="st">   </span><span class="co"># rdata needs to be created beforehand</span>
++<span class="st">   </span>conStr &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;Driver={ODBC Driver 13 for SQL Server};Server=.;&quot;</span>,
++<span class="st">                    &quot;Database=RevoTestDB;Trusted_Connection=Yes;&quot;</span>)
++<span class="st">   </span>out.table =<span class="st"> &quot;rdata&quot;</span>
++<span class="st">   </span><span class="co"># write the model to the table</span>
++<span class="st">   </span>ds =<span class="st"> </span><span class="kw">RxOdbcData</span>(<span class="dt">table =</span> out.table, <span class="dt">connectionString =</span> conStr)
++<span class="st"> </span>
++<span class="st">   </span><span class="kw">rxWriteObject</span>(ds, <span class="st">&quot;linmod.v1&quot;</span>, mm, <span class="dt">keyName =</span> <span class="st">&quot;key&quot;</span>,
++<span class="st">                 </span><span class="dt">valueName =</span> <span class="st">&quot;value&quot;</span>)
++<span class="st"> </span>
++<span class="st">   </span><span class="co"># the model needs to be serialized before it can be added to the return list</span>
++<span class="st">   </span>mm &lt;-<span class="st"> </span><span class="kw">memCompress</span>(<span class="kw">serialize</span>(mm, <span class="dt">connection =</span> <span class="ot">NULL</span>), <span class="dt">type=</span><span class="st">&quot;gzip&quot;</span>)
++<span class="st">   </span><span class="kw">return</span>(<span class="kw">data.frame</span>(mm))
++<span class="st"> </span>}
+&gt;<span class="st"> </span>
+<span class="er">&gt;</span><span class="st"> </span>conStr &lt;-<span class="st"> &quot;Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;&quot;</span>
+&gt;<span class="st"> </span><span class="co"># create  an InputData object for the input data frame in_df</span>
+<span class="er">&gt;</span><span class="st"> </span>indata &lt;-<span class="st"> </span><span class="kw">InputData</span>(<span class="st">&quot;in_df&quot;</span>,
++<span class="st">                </span><span class="dt">defaultQuery =</span> <span class="kw">paste0</span>(<span class="st">&quot;select top 10000 ArrDelay,CRSDepTime,&quot;</span>,
++<span class="st">                                      &quot;DayOfWeek,CRSDepHour from cleanData&quot;</span>))
+&gt;<span class="st"> </span><span class="co"># create the sql server stored procedure object</span>
+<span class="er">&gt;</span><span class="st"> </span>trainSP1 &lt;-<span class="st"> </span><span class="kw">StoredProcedure</span>(<span class="st">'train1'</span>, <span class="st">&quot;spTrain_df_to_df&quot;</span>, indata,
++<span class="st">                        </span><span class="dt">dbName =</span> <span class="st">&quot;RevoTestDB&quot;</span>,
++<span class="st">                        </span><span class="dt">connectionString =</span> conStr,
++<span class="st">                        </span><span class="dt">filePath =</span> <span class="st">&quot;C:</span><span class="ch">\\</span><span class="st">Users</span><span class="ch">\\</span><span class="st">user</span><span class="ch">\\</span><span class="st">Documents&quot;</span>)
+&gt;<span class="st"> </span><span class="co"># spRegisterSp and executeStoredProcedure do not require a connection string since we</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># provided one when we created trainSP1</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="kw">registerStoredProcedure</span>(trainSP1)
+[<span class="dv">1</span>] <span class="ot">TRUE</span>
+&gt;<span class="st"> </span>model &lt;-<span class="st"> </span><span class="kw">executeStoredProcedure</span>(trainSP1, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
+exec spTrain_df_to_df 
+&gt;<span class="st"> </span>result2v2 &lt;-<span class="st"> </span><span class="kw">rxReadObject</span>(model$data[<span class="dv">1</span>,<span class="dv">1</span>][[<span class="dv">1</span>]])
+&gt;<span class="st"> </span>result2v2
+Call:
+<span class="kw">rxLinMod</span>(<span class="dt">formula =</span> formula, <span class="dt">data =</span> in_df, <span class="dt">transformFunc =</span> <span class="ot">NULL</span>, 
+    <span class="dt">transformVars =</span> <span class="ot">NULL</span>)
+
+Linear Regression Results for:<span class="st"> </span>ArrDelay ~<span class="st"> </span>CRSDepTime +<span class="st"> </span>DayOfWeek +<span class="st"> </span>CRSDepHour:DayOfWeek
+Data:<span class="st"> </span>in_df
+Dependent <span class="kw">variable</span>(s):<span class="st"> </span>ArrDelay
+Total independent variables:<span class="st"> </span><span class="dv">16</span> (Including number dropped:<span class="st"> </span><span class="dv">7</span>)
+Number of valid observations:<span class="st"> </span><span class="dv">9713</span>
+Number of missing observations:<span class="st"> </span><span class="dv">287</span> 
+ 
+Coefficients:
+<span class="st">                                      </span>ArrDelay
+(Intercept)                        -<span class="fl">12.2606079</span>
+CRSDepTime                           <span class="fl">0.8384946</span>
+DayOfWeek=Monday                     <span class="fl">9.9722108</span>
+DayOfWeek=Tuesday                   <span class="fl">10.7932985</span>
+DayOfWeek=Wednesday                  <span class="fl">0.2561862</span>
+DayOfWeek=Thursday                     Dropped
+DayOfWeek=Friday                       Dropped
+DayOfWeek=Saturday                     Dropped
+DayOfWeek=Sunday                       Dropped
+CRSDepHour for DayOfWeek=Monday     -<span class="fl">0.4449961</span>
+CRSDepHour for DayOfWeek=Tuesday    -<span class="fl">0.6194943</span>
+CRSDepHour for DayOfWeek=Wednesday   <span class="fl">1.0483718</span>
+CRSDepHour for DayOfWeek=Thursday    <span class="fl">0.5470396</span>
+CRSDepHour for DayOfWeek=Friday        Dropped
+CRSDepHour for DayOfWeek=Saturday      Dropped
+CRSDepHour for DayOfWeek=Sunday        Dropped</code></pre></div>
+</div>
+<div id="training-example-reading-from-a-data-frame-and-return-a-model-as-an-output-parameter" class="section level3">
+<h3>Training Example: reading from a data frame and return a model as an output parameter</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span>train2 &lt;-<span class="st"> </span>function(in_df) {
++<span class="st">     </span>factorLevels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Monday&quot;</span>,<span class="st">&quot;Tuesday&quot;</span>,<span class="st">&quot;Wednesday&quot;</span>,<span class="st">&quot;Thursday&quot;</span>,<span class="st">&quot;Friday&quot;</span>,<span class="st">&quot;Saturday&quot;</span>,<span class="st">&quot;Sunday&quot;</span>)
++<span class="st">   </span>in_df[,<span class="st">&quot;DayOfWeek&quot;</span>] &lt;-<span class="st"> </span><span class="kw">factor</span>(in_df[,<span class="st">&quot;DayOfWeek&quot;</span>], <span class="dt">levels=</span>factorLevels)
++<span class="st">   </span><span class="co"># The model formula</span>
++<span class="st">   </span>formula &lt;-<span class="st"> </span>ArrDelay ~<span class="st"> </span>CRSDepTime +<span class="st"> </span>DayOfWeek +<span class="st"> </span>CRSDepHour:DayOfWeek
++<span class="st">   </span><span class="co"># Train the model</span>
++<span class="st">   </span><span class="kw">rxSetComputeContext</span>(<span class="st">&quot;local&quot;</span>)
++<span class="st">   </span>mm &lt;-<span class="st"> </span><span class="kw">rxLinMod</span>(formula, <span class="dt">data =</span> in_df, <span class="dt">transformFunc =</span> <span class="ot">NULL</span>, <span class="dt">transformVars =</span> <span class="ot">NULL</span>)
++<span class="st">   </span><span class="co"># the model needs to be serialized before it can be added to the return list</span>
++<span class="st">   </span>mm &lt;-<span class="st"> </span><span class="kw">memCompress</span>(<span class="kw">serialize</span>(mm, <span class="dt">connection =</span> <span class="ot">NULL</span>),<span class="dt">type=</span><span class="st">&quot;gzip&quot;</span>)
++<span class="st">   </span><span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">mm =</span> mm))
++<span class="st"> </span>}
+&gt;<span class="st"> </span><span class="co"># create  an InputData object for the input data frame in_df</span>
+<span class="er">&gt;</span><span class="st"> </span>indata &lt;-<span class="st"> </span><span class="kw">InputData</span>(<span class="dt">name =</span> <span class="st">&quot;in_df&quot;</span>,
++<span class="st">                 </span><span class="dt">query =</span> <span class="kw">paste0</span>(<span class="st">&quot;select top 10000 ArrDelay,CRSDepTime,&quot;</span>,
++<span class="st">                                &quot;DayOfWeek,CRSDepHour from cleanData&quot;</span>))
+&gt;<span class="st"> </span><span class="co"># create an OutputParameter object for the model inside the return list</span>
+<span class="er">&gt;</span><span class="st"> </span>outModelParam &lt;-<span class="st"> </span><span class="kw">OutputParameter</span>(<span class="st">&quot;mm&quot;</span>, <span class="st">&quot;raw&quot;</span>)
+&gt;<span class="st"> </span>trainSP2 &lt;-<span class="st"> </span><span class="kw">StoredProcedure</span>(train2, <span class="st">&quot;spTrain_df_to_op&quot;</span>, indata, outModelParam,
++<span class="st">                         </span><span class="dt">filePath =</span> <span class="st">&quot;C:</span><span class="ch">\\</span><span class="st">Users</span><span class="ch">\\</span><span class="st">user</span><span class="ch">\\</span><span class="st">Documents&quot;</span>)
+&gt;<span class="st"> </span>conStr &lt;-<span class="st"> &quot;Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;&quot;</span>
+&gt;<span class="st"> </span><span class="co"># need to pass connection string to registerStoredProcedure and executeStoredProcedure since we did not</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># provide one when creating trainSP2</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="kw">registerStoredProcedure</span>(trainSP2, conStr)
+[<span class="dv">1</span>] <span class="ot">TRUE</span>
+&gt;<span class="st"> </span>model &lt;-<span class="st"> </span><span class="kw">executeStoredProcedure</span>(trainSP2, indata, <span class="dt">connectionString =</span> conStr, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
+exec spTrain_df_to_op  @input_data_1_outer =<span class="st"> </span>?,  @mm_outer =<span class="st"> </span>?
+&gt;<span class="st"> </span><span class="kw">rxReadObject</span>(model$params[[<span class="dv">1</span>]])
+Call:
+<span class="kw">rxLinMod</span>(<span class="dt">formula =</span> formula, <span class="dt">data =</span> in_df, <span class="dt">transformFunc =</span> <span class="ot">NULL</span>, 
+    <span class="dt">transformVars =</span> <span class="ot">NULL</span>)
+
+Linear Regression Results for:<span class="st"> </span>ArrDelay ~<span class="st"> </span>CRSDepTime +<span class="st"> </span>DayOfWeek +<span class="st"> </span>CRSDepHour:DayOfWeek
+Data:<span class="st"> </span>in_df
+Dependent <span class="kw">variable</span>(s):<span class="st"> </span>ArrDelay
+Total independent variables:<span class="st"> </span><span class="dv">16</span> (Including number dropped:<span class="st"> </span><span class="dv">7</span>)
+Number of valid observations:<span class="st"> </span><span class="dv">9713</span>
+Number of missing observations:<span class="st"> </span><span class="dv">287</span> 
+ 
+Coefficients:
+<span class="st">                                      </span>ArrDelay
+(Intercept)                        -<span class="fl">12.2606079</span>
+CRSDepTime                           <span class="fl">0.8384946</span>
+DayOfWeek=Monday                     <span class="fl">9.9722108</span>
+DayOfWeek=Tuesday                   <span class="fl">10.7932985</span>
+DayOfWeek=Wednesday                  <span class="fl">0.2561862</span>
+DayOfWeek=Thursday                     Dropped
+DayOfWeek=Friday                       Dropped
+DayOfWeek=Saturday                     Dropped
+DayOfWeek=Sunday                       Dropped
+CRSDepHour for DayOfWeek=Monday     -<span class="fl">0.4449961</span>
+CRSDepHour for DayOfWeek=Tuesday    -<span class="fl">0.6194943</span>
+CRSDepHour for DayOfWeek=Wednesday   <span class="fl">1.0483718</span>
+CRSDepHour for DayOfWeek=Thursday    <span class="fl">0.5470396</span>
+CRSDepHour for DayOfWeek=Friday        Dropped
+CRSDepHour for DayOfWeek=Saturday      Dropped
+CRSDepHour for DayOfWeek=Sunday        Dropped</code></pre></div>
+</div>
+<div id="scoring-example-batch-prediction" class="section level3">
+<h3>Scoring Example: batch prediction</h3>
+<p>The data comes into the function as a data frame, the model comes in as a parameter, the name assigned to the predicted variable comes in as a parameter as well. The prediction is returned as a data frame. P-value becomes an output parameter of the stored procedure. It does not get propagated back to R, however, it can be captured from SSMS.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="co"># indata - input data frame</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># model_param - serialized model object</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># predVarName - name of the predicted variable</span>
+<span class="er">&gt;</span><span class="st"> </span>score1 &lt;-<span class="st"> </span>function(in_df, model_param, predVarNameInParam) {
++<span class="st">     </span>factorLevels &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Monday&quot;</span>,<span class="st">&quot;Tuesday&quot;</span>,<span class="st">&quot;Wednesday&quot;</span>,<span class="st">&quot;Thursday&quot;</span>,<span class="st">&quot;Friday&quot;</span>,<span class="st">&quot;Saturday&quot;</span>,<span class="st">&quot;Sunday&quot;</span>)
++<span class="st">     </span>in_df[,<span class="st">&quot;DayOfWeek&quot;</span>] &lt;-<span class="st"> </span><span class="kw">factor</span>(in_df[,<span class="st">&quot;DayOfWeek&quot;</span>], <span class="dt">levels=</span>factorLevels)
++<span class="st">   </span>mm &lt;-<span class="st"> </span><span class="kw">rxReadObject</span>(<span class="kw">as.raw</span>(model_param))
++<span class="st">   </span><span class="co"># Predict</span>
++<span class="st">   </span>result &lt;-<span class="st"> </span><span class="kw">rxPredict</span>(<span class="dt">modelObject =</span> mm,
++<span class="st">                       </span><span class="dt">data =</span> in_df,
++<span class="st">                       </span><span class="dt">outData =</span> <span class="ot">NULL</span>,
++<span class="st">                       </span><span class="dt">predVarNames =</span> predVarNameInParam,
++<span class="st">                       </span><span class="dt">extraVarsToWrite =</span> <span class="kw">c</span>(<span class="st">&quot;ArrDelay&quot;</span>),
++<span class="st">                       </span><span class="dt">writeModelVars =</span> <span class="ot">TRUE</span>,
++<span class="st">                       </span><span class="dt">overwrite =</span> <span class="ot">TRUE</span>)
++<span class="st">   </span><span class="kw">return</span>(<span class="kw">list</span>(<span class="dt">result =</span> result, <span class="dt">pvOutParam =</span> mm$f.pvalue))
++<span class="st"> </span>}
+&gt;<span class="st"> </span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># create  an InputData object for the input data frame in_df</span>
+<span class="er">&gt;</span><span class="st"> </span>indata &lt;-<span class="st"> </span><span class="kw">InputData</span>(<span class="dt">name =</span> <span class="st">&quot;in_df&quot;</span>, <span class="dt">defaultQuery =</span> <span class="st">&quot;SELECT top 10 * from cleanData&quot;</span>)
+&gt;<span class="st"> </span><span class="co"># create InputParameter objects for model_param and predVarNameInParam</span>
+<span class="er">&gt;</span><span class="st"> </span>model &lt;-<span class="st"> </span><span class="kw">InputParameter</span>(<span class="st">&quot;model_param&quot;</span>, <span class="st">&quot;raw&quot;</span>,
++<span class="st">                       </span><span class="dt">defaultQuery =</span> <span class="kw">paste</span>(<span class="st">&quot;select top 1 value from rdata&quot;</span>,
++<span class="st">                                            &quot;where [key] = 'linmod.v1'&quot;</span>))
+&gt;<span class="st"> </span>predVarNameInParam &lt;-<span class="st"> </span><span class="kw">InputParameter</span>(<span class="st">&quot;predVarNameInParam&quot;</span>, <span class="st">&quot;character&quot;</span>)
+&gt;<span class="st"> </span><span class="co"># create OutputData object for the data frame inside the return list</span>
+<span class="er">&gt;</span><span class="st"> </span>outData &lt;-<span class="st"> </span><span class="kw">OutputData</span>(<span class="st">&quot;result&quot;</span>)
+&gt;<span class="st"> </span><span class="co"># create OutputParameter object for non data frame variable inside the return list</span>
+<span class="er">&gt;</span><span class="st"> </span>pvOutParam &lt;-<span class="st"> </span><span class="kw">OutputParameter</span>(<span class="st">&quot;pvOutParam&quot;</span>, <span class="st">&quot;numeric&quot;</span>)
+&gt;<span class="st"> </span>scoreSP1 &lt;-<span class="st"> </span><span class="kw">StoredProcedure</span>(score1, <span class="st">&quot;spScore_df_param_df&quot;</span>, indata, model, predVarNameInParam, outData, pvOutParam,
++<span class="st">                       </span><span class="dt">filePath =</span> <span class="st">&quot;C:</span><span class="ch">\\</span><span class="st">Users</span><span class="ch">\\</span><span class="st">user</span><span class="ch">\\</span><span class="st">Documents&quot;</span>)
+&gt;<span class="st"> </span>conStr &lt;-<span class="st"> &quot;Driver={ODBC Driver 13 for SQL Server};Server=.;Database=RevoTestDB;Trusted_Connection=Yes;&quot;</span>
+&gt;<span class="st"> </span><span class="co"># connection string necessary for registrations and execution</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="co"># since we did not pass it to StoredProcedure</span>
+<span class="er">&gt;</span><span class="st"> </span><span class="kw">registerStoredProcedure</span>(scoreSP1, conStr)
+[<span class="dv">1</span>] <span class="ot">TRUE</span>
+&gt;<span class="st"> </span>model &lt;-<span class="st"> </span><span class="kw">executeStoredProcedure</span>(scoreSP1, <span class="dt">predVarNameInParam =</span> <span class="st">&quot;ArrDelayEstimate&quot;</span>, <span class="dt">connectionString =</span> conStr, <span class="dt">verbose =</span> <span class="ot">TRUE</span>)
+exec spScore_df_param_df  @predVarNameInParam_outer =<span class="st"> </span>?,  @pvOutParam_outer =<span class="st"> </span>?
+&gt;<span class="st"> </span>model$data
+     column1 column2   column3 column4 column5
+<span class="dv">1</span>  <span class="fl">1.8120845</span>       <span class="dv">6</span>  <span class="fl">9.666666</span>  Monday       <span class="dv">9</span>
+<span class="dv">2</span>  <span class="fl">0.4219664</span>      -<span class="dv">2</span>  <span class="fl">6.416667</span>  Monday       <span class="dv">6</span>
+<span class="dv">3</span>  <span class="fl">6.2803173</span>      -<span class="dv">2</span> <span class="fl">20.833334</span>  Monday      <span class="dv">20</span>
+<span class="dv">4</span>  <span class="fl">5.6771952</span>     -<span class="dv">15</span> <span class="fl">19.583334</span>  Monday      <span class="dv">19</span>
+<span class="dv">5</span>  <span class="fl">2.1357094</span>      -<span class="dv">7</span> <span class="fl">10.583334</span>  Monday      <span class="dv">10</span>
+<span class="dv">6</span>  <span class="fl">6.0449431</span>      <span class="dv">16</span> <span class="fl">21.083332</span>  Monday      <span class="dv">21</span>
+<span class="dv">7</span>  <span class="fl">2.5990813</span>       <span class="dv">0</span> <span class="fl">11.666666</span>  Monday      <span class="dv">11</span>
+<span class="dv">8</span>  <span class="fl">5.7213215</span>      -<span class="dv">9</span> <span class="fl">20.166668</span>  Monday      <span class="dv">20</span>
+<span class="dv">9</span>  <span class="fl">0.8853391</span>       <span class="dv">2</span>  <span class="fl">7.500000</span>  Monday       <span class="dv">7</span>
+<span class="dv">10</span> <span class="fl">1.2788375</span>      <span class="dv">19</span>  <span class="fl">8.500000</span>  Monday       <span class="dv">8</span>
+&gt;<span class="st"> </span>model$params[[<span class="dv">1</span>]]
+[<span class="dv">1</span>] <span class="fl">4.032124e-154</span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

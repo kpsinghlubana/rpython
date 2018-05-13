@@ -1,0 +1,10 @@
+Package: olapR
+Title: OLAP Cube access in R
+Version: 1.0.0
+Author: 'Microsoft Corporation'
+Description: OLAP Cube access in R
+Depends: R (>= 3.2.2)
+Suggests: testthat
+License: file LICENSE
+Built: R 3.4.1; x86_64-w64-mingw32; 2018-02-11 00:38:22 UTC; windows
+Archs: x64
